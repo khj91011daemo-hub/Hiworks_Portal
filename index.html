@@ -9,98 +9,61 @@
             --brand-660c: #0067B1;
             --brand-646c: #3E72A2;
             --gold: #C5A059;
+            --gray: #777;
         }
 
         body { 
-            margin: 0; 
-            font-family: sans-serif; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; /* 전체 페이지의 스크롤은 차단 */
+            margin: 0; font-family: sans-serif; height: 100vh; 
+            display: flex; flex-direction: column; overflow: hidden; 
         }
 
         .tab-container {
-            display: flex;
-            background: var(--brand-660c);
-            height: 45px;
-            align-items: center;
-            position: relative;
-            z-index: 1000;
-            flex-shrink: 0;
+            display: flex; background: var(--brand-660c); height: 45px;
+            align-items: center; position: relative; z-index: 1000; flex-shrink: 0;
         }
 
-        .tab-bar { display: flex; flex: 1; height: 100%; }
+        .tab-bar { display: flex; flex: 1; height: 100%; overflow-x: auto; }
 
         .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
 
         .dropbtn {
-            color: #ffffff;
-            padding: 0 15px;
-            cursor: pointer;
-            font-size: 14px;
-            height: 100%;
-            display: flex;
-            align-items: center;
+            color: #ffffff; padding: 0 15px; cursor: pointer; font-size: 14px;
+            height: 100%; display: flex; align-items: center; white-space: nowrap;
         }
 
         .dropdown:hover { background: var(--brand-646c); }
 
         .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 45px;
-            left: 0;
-            background-color: white;
-            min-width: 140px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            z-index: 2000;
+            display: none; position: absolute; top: 45px; left: 0;
+            background-color: white; min-width: 140px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 2000;
         }
 
         .dropdown:hover .dropdown-content { display: block; }
 
         .dropdown-content div {
-            color: var(--brand-660c);
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 13px;
-            border-bottom: 1px solid #eee;
+            color: var(--brand-660c); padding: 10px 15px; cursor: pointer;
+            font-size: 13px; border-bottom: 1px solid #eee;
         }
 
         .dropdown-content div:hover { background-color: #f1f1f1; }
 
         .tab-item {
-            display: flex;
-            align-items: center;
-            color: #ffffff;
-            padding: 0 15px;
-            cursor: pointer;
-            font-size: 14px;
-            height: 100%;
+            display: flex; align-items: center; color: #ffffff; padding: 0 15px;
+            cursor: pointer; font-size: 14px; height: 100%; white-space: nowrap;
         }
         .tab-item:hover { background: var(--brand-646c); }
 
         .btn-external {
-            background: var(--gold);
-            color: white;
-            padding: 0 12px;
-            font-size: 12px;
-            cursor: pointer;
-            line-height: 30px;
-            margin: 0 10px;
-            border-radius: 4px;
-            white-space: nowrap;
-            font-weight: bold;
+            background: var(--gold); color: white; padding: 0 8px; font-size: 11px;
+            cursor: pointer; line-height: 28px; margin: 0 5px; border-radius: 4px;
+            white-space: nowrap; font-weight: bold;
         }
+        .btn-back { background: var(--gray); }
 
         #content-frame { 
-            width: 100%; 
-            flex-grow: 1; /* 남은 화면을 꽉 채움 */
-            border: none; 
-            display: block;
-            /* 모바일 터치 스크롤 최적화 */
-            overflow: auto;
-            -webkit-overflow-scrolling: touch; 
+            width: 100%; flex-grow: 1; border: none; display: block;
+            overflow: auto; -webkit-overflow-scrolling: touch; 
         }
     </style>
 </head>
@@ -154,7 +117,8 @@
             </div>
         </div>
         
-        <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
+        <div class="btn-external btn-back" onclick="goBack()">이전</div>
+        <div class="btn-external" onclick="openExternal()">외부</div>
     </div>
     
     <iframe id="content-frame" 
@@ -172,6 +136,15 @@
 
         function openExternal() {
             window.open(iframe.src, '_blank');
+        }
+
+        function goBack() {
+            // iframe 내부의 history 객체를 호출하여 이전 페이지로 이동
+            try {
+                iframe.contentWindow.history.back();
+            } catch (e) {
+                console.log("보안 정책상 이전 페이지로 이동할 수 없습니다.");
+            }
         }
     </script>
 </body>
