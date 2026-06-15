@@ -13,94 +13,64 @@
 
         body { margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* 탭 컨테이너 자체를 overflow: visible로 설정하여 내부 메뉴가 잘리지 않게 함 */
         .tab-container {
-            display: flex;
-            background: var(--brand-660c);
-            height: 45px;
-            align-items: center;
-            position: relative;
-            z-index: 1000;
-            padding: 0 5px;
-            overflow: visible;
+            display: flex; background: var(--brand-660c); height: 45px; align-items: center;
+            position: relative; z-index: 1000; padding: 0 5px; overflow: visible;
         }
 
-        .tab-bar { 
-            display: flex; 
-            height: 100%; 
-            flex: 1; 
-            align-items: center;
-            overflow: visible; /* 잘리지 않게 visible로 변경 */
-        }
+        .tab-bar { display: flex; height: 100%; flex: 1; align-items: center; overflow: visible; }
 
-        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
-
-        .dropbtn {
-            color: #ffffff; padding: 0 15px; cursor: pointer; font-size: 14px;
-            height: 100%; display: flex; align-items: center; white-space: nowrap;
-        }
-
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; cursor: pointer; }
+        .dropbtn { color: #ffffff; padding: 0 15px; font-size: 14px; height: 100%; display: flex; align-items: center; white-space: nowrap; }
         .dropdown:hover { background: var(--brand-646c); }
 
         .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 45px;
-            left: 0;
-            background-color: white;
-            min-width: 140px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 9999;
-            border-radius: 0 0 4px 4px;
+            display: none; position: absolute; top: 45px; left: 0; background-color: white;
+            min-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 9999; border-radius: 0 0 4px 4px;
         }
-
-        .dropdown:hover .dropdown-content { display: block; }
-
-        .dropdown-content div {
-            color: var(--brand-660c); padding: 12px 15px; cursor: pointer;
-            font-size: 13px; border-bottom: 1px solid #eee; white-space: nowrap;
-        }
-
+        .dropdown.active .dropdown-content { display: block; }
+        .dropdown-content div { color: var(--brand-660c); padding: 12px 15px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #eee; white-space: nowrap; }
         .dropdown-content div:hover { background-color: #f1f1f1; }
 
-        .tab-item {
-            display: flex; align-items: center; color: #ffffff; padding: 0 15px;
-            cursor: pointer; font-size: 14px; height: 100%; white-space: nowrap;
-        }
+        .tab-item { display: flex; align-items: center; color: #ffffff; padding: 0 15px; cursor: pointer; font-size: 14px; height: 100%; white-space: nowrap; }
         .tab-item:hover { background: var(--brand-646c); }
 
         .btn-external {
-            background: var(--gold); color: white; padding: 0 10px; font-size: 12px;
-            cursor: pointer; height: 28px; display: flex; align-items: center;
-            margin: 0 5px; border-radius: 4px; white-space: nowrap; font-weight: bold;
-            flex-shrink: 0;
+            background: var(--gold); color: white; padding: 0 10px; font-size: 12px; cursor: pointer; height: 28px;
+            display: flex; align-items: center; margin: 0 5px; border-radius: 4px; white-space: nowrap; font-weight: bold; flex-shrink: 0;
         }
 
-        #content-frame { 
-            width: 100%; 
-            flex-grow: 1;
-            border: none; 
-            display: block;
+        #content-frame { width: 100%; flex-grow: 1; border: none; display: block; }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .tab-container { height: auto; flex-direction: column; align-items: flex-start; }
+            .tab-bar { flex-direction: column; width: 100%; align-items: flex-start; }
+            .dropdown { width: 100%; }
+            .dropdown-content { position: static; width: 100%; box-shadow: none; }
         }
     </style>
 </head>
 <body>
     <div class="tab-container">
         <div class="tab-bar">
-            <div class="dropdown"><div class="dropbtn">메일 ▾</div>
+            <div class="dropdown" onclick="toggleMenu(this)">
+                <div class="dropbtn">메일 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://mail.office.hiworks.com/daemo.co.kr/')">개인메일</div>
                     <div onclick="loadPage('https://team-mail.office.hiworks.com/')">공용메일</div>
                 </div>
             </div>
-            <div class="dropdown"><div class="dropbtn">전자결재 ▾</div>
+            <div class="dropdown" onclick="toggleMenu(this)">
+                <div class="dropbtn">전자결재 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/lists/A')">진행 중</div>
                     <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/all')">내문서</div>
                     <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/temp')">임시저장</div>
                 </div>
             </div>
-            <div class="dropdown"><div class="dropbtn">근무 ▾</div>
+            <div class="dropdown" onclick="toggleMenu(this)">
+                <div class="dropbtn">근무 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://hr-work.office.hiworks.com/personal/my-status/vacation')">휴가 현황</div>
                     <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/vacation-apply')">휴가신청</div>
@@ -108,7 +78,8 @@
                     <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/work-holiday')">휴(무)일근무</div>
                 </div>
             </div>
-            <div class="dropdown"><div class="dropbtn">예약 ▾</div>
+            <div class="dropdown" onclick="toggleMenu(this)">
+                <div class="dropbtn">예약 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/841')">회의실</div>
                     <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843')">차량</div>
@@ -116,7 +87,8 @@
                 </div>
             </div>
             <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
-            <div class="dropdown"><div class="dropbtn">게시판 ▾</div>
+            <div class="dropdown" onclick="toggleMenu(this)">
+                <div class="dropbtn">게시판 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2540?page=1')">공지사항</div>
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
@@ -126,9 +98,16 @@
         <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
     </div>
     
-    <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
+    <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" 
+            sandbox="allow-forms allow-scripts allow-popups"></iframe>
 
     <script>
+        function toggleMenu(el) {
+            // 다른 메뉴 닫기
+            document.querySelectorAll('.dropdown').forEach(d => { if(d !== el) d.classList.remove('active'); });
+            // 클릭한 메뉴 토글
+            el.classList.toggle('active');
+        }
         const iframe = document.getElementById('content-frame');
         function loadPage(url) { iframe.src = url; }
         function openExternal() { window.open(iframe.src, '_blank'); }
