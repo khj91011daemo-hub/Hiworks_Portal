@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Hiworks 통합 포털</title>
     <style>
         :root {
@@ -13,7 +13,6 @@
 
         body { margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* 탭 컨테이너 자체를 overflow: visible로 설정하여 내부 메뉴가 잘리지 않게 함 */
         .tab-container {
             display: flex;
             background: var(--brand-660c);
@@ -30,7 +29,7 @@
             height: 100%; 
             flex: 1; 
             align-items: center;
-            overflow: visible; /* 잘리지 않게 visible로 변경 */
+            overflow: visible;
         }
 
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
@@ -76,9 +75,18 @@
             flex-shrink: 0;
         }
 
+        /* iframe을 감싸는 컨테이너 추가 (터치 및 줌 허용) */
+        .frame-wrapper {
+            width: 100%;
+            flex-grow: 1;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y;
+        }
+
         #content-frame { 
             width: 100%; 
-            flex-grow: 1;
+            height: 100%;
             border: none; 
             display: block;
         }
@@ -126,7 +134,9 @@
         <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
     </div>
     
-    <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
+    <div class="frame-wrapper">
+        <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
+    </div>
 
     <script>
         const iframe = document.getElementById('content-frame');
