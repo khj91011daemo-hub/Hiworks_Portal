@@ -12,17 +12,15 @@
             --gray: #777;
         }
 
-        body { 
-            margin: 0; font-family: sans-serif; height: 100vh; 
-            display: flex; flex-direction: column; overflow: hidden; 
-        }
+        body { margin: 0; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         .tab-container {
             display: flex; background: var(--brand-660c); height: 45px;
             align-items: center; position: relative; z-index: 1000; flex-shrink: 0;
+            justify-content: space-between; /* 탭바와 우측 버튼 분리 */
         }
 
-        .tab-bar { display: flex; flex: 1; height: 100%; overflow-x: auto; }
+        .tab-bar { display: flex; height: 100%; overflow-x: auto; }
 
         .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
 
@@ -54,11 +52,14 @@
         }
         .tab-item:hover { background: var(--brand-646c); }
 
+        /* 기존 외부 버튼 스타일 유지 */
         .btn-external {
-            background: var(--gold); color: white; padding: 0 8px; font-size: 11px;
-            cursor: pointer; line-height: 28px; margin: 0 5px; border-radius: 4px;
+            background: var(--gold); color: white; padding: 0 12px; font-size: 12px;
+            cursor: pointer; line-height: 30px; margin: 0 5px; border-radius: 4px;
             white-space: nowrap; font-weight: bold;
         }
+        
+        /* 이전 버튼용 스타일 */
         .btn-back { background: var(--gray); }
 
         #content-frame { 
@@ -77,7 +78,6 @@
                     <div onclick="loadPage('https://team-mail.office.hiworks.com/')">공용메일</div>
                 </div>
             </div>
-
             <div class="dropdown">
                 <div class="dropbtn">전자결재 ▾</div>
                 <div class="dropdown-content">
@@ -86,7 +86,6 @@
                     <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/temp')">임시저장</div>
                 </div>
             </div>
-
             <div class="dropdown">
                 <div class="dropbtn">근무 ▾</div>
                 <div class="dropdown-content">
@@ -96,7 +95,6 @@
                     <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/work-holiday')">휴(무)일근무</div>
                 </div>
             </div>
-
             <div class="dropdown">
                 <div class="dropbtn">예약 ▾</div>
                 <div class="dropdown-content">
@@ -105,9 +103,7 @@
                     <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/884')">노트북</div>
                 </div>
             </div>
-
             <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
-
             <div class="dropdown">
                 <div class="dropbtn">게시판 ▾</div>
                 <div class="dropdown-content">
@@ -117,8 +113,10 @@
             </div>
         </div>
         
-        <div class="btn-external btn-back" onclick="goBack()">이전</div>
-        <div class="btn-external" onclick="openExternal()">외부</div>
+        <div style="display: flex; margin-right: 10px;">
+            <div class="btn-external btn-back" onclick="goBack()">이전</div>
+            <div class="btn-external" onclick="openExternal()">외부</div>
+        </div>
     </div>
     
     <iframe id="content-frame" 
@@ -139,11 +137,10 @@
         }
 
         function goBack() {
-            // iframe 내부의 history 객체를 호출하여 이전 페이지로 이동
             try {
                 iframe.contentWindow.history.back();
             } catch (e) {
-                console.log("보안 정책상 이전 페이지로 이동할 수 없습니다.");
+                console.log("이전 페이지로 이동 불가");
             }
         }
     </script>
