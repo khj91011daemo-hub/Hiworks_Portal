@@ -11,96 +11,127 @@
             --gold: #C5A059;
         }
 
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        body { margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        .top-bar {
-            height: 50px; background: var(--brand-660c); color: white;
-            display: flex; align-items: center; padding: 0 10px; flex-shrink: 0;
+        /* 탭 컨테이너 자체를 overflow: visible로 설정하여 내부 메뉴가 잘리지 않게 함 */
+        .tab-container {
+            display: flex;
+            background: var(--brand-660c);
+            height: 45px;
+            align-items: center;
+            position: relative;
             z-index: 1000;
+            padding: 0 5px;
+            overflow: visible;
         }
 
-        .menu-wrapper { display: flex; align-items: center; height: 100%; flex-grow: 1; }
-        
-        .menu-item { 
-            position: relative; padding: 0 15px; cursor: pointer; height: 100%; 
-            display: flex; align-items: center; white-space: nowrap; font-size: 14px;
-        }
-        .menu-item:hover { background: var(--brand-646c); }
-
-        .dropdown { 
-            display: none; position: absolute; top: 50px; left: 0; 
-            background: white; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            z-index: 2000; min-width: 140px; border-radius: 0 0 4px 4px;
-        }
-        .menu-item:hover .dropdown { display: block; }
-        
-        .dropdown div { 
-            padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 13px; 
-        }
-        .dropdown div:hover { background: #f0f0f0; }
-
-        .btn-ext {
-            margin-left: auto; background: var(--gold); padding: 5px 10px; border-radius: 4px;
-            cursor: pointer; font-size: 12px; font-weight: bold; flex-shrink: 0;
+        .tab-bar { 
+            display: flex; 
+            height: 100%; 
+            flex: 1; 
+            align-items: center;
+            overflow: visible; /* 잘리지 않게 visible로 변경 */
         }
 
-        #main-frame { width: 100%; flex-grow: 1; border: none; display: block; }
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
+
+        .dropbtn {
+            color: #ffffff; padding: 0 15px; cursor: pointer; font-size: 14px;
+            height: 100%; display: flex; align-items: center; white-space: nowrap;
+        }
+
+        .dropdown:hover { background: var(--brand-646c); }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            left: 0;
+            background-color: white;
+            min-width: 140px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 9999;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .dropdown:hover .dropdown-content { display: block; }
+
+        .dropdown-content div {
+            color: var(--brand-660c); padding: 12px 15px; cursor: pointer;
+            font-size: 13px; border-bottom: 1px solid #eee; white-space: nowrap;
+        }
+
+        .dropdown-content div:hover { background-color: #f1f1f1; }
+
+        .tab-item {
+            display: flex; align-items: center; color: #ffffff; padding: 0 15px;
+            cursor: pointer; font-size: 14px; height: 100%; white-space: nowrap;
+        }
+        .tab-item:hover { background: var(--brand-646c); }
+
+        .btn-external {
+            background: var(--gold); color: white; padding: 0 10px; font-size: 12px;
+            cursor: pointer; height: 28px; display: flex; align-items: center;
+            margin: 0 5px; border-radius: 4px; white-space: nowrap; font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        #content-frame { 
+            width: 100%; 
+            flex-grow: 1;
+            border: none; 
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="menu-wrapper">
-            <!-- 메일 -->
-            <div class="menu-item">메일 ▾
-                <div class="dropdown">
-                    <div onclick="go('https://mail.office.hiworks.com/daemo.co.kr/')">개인메일</div>
-                    <div onclick="go('https://team-mail.office.hiworks.com/')">공용메일</div>
+    <div class="tab-container">
+        <div class="tab-bar">
+            <div class="dropdown"><div class="dropbtn">메일 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://mail.office.hiworks.com/daemo.co.kr/')">개인메일</div>
+                    <div onclick="loadPage('https://team-mail.office.hiworks.com/')">공용메일</div>
                 </div>
             </div>
-            <!-- 전자결재 -->
-            <div class="menu-item">전자결재 ▾
-                <div class="dropdown">
-                    <div onclick="go('https://approval.office.hiworks.com/daemo.co.kr/approval/document/lists/A')">진행 중</div>
-                    <div onclick="go('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/all')">내문서</div>
-                    <div onclick="go('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/temp')">임시저장</div>
+            <div class="dropdown"><div class="dropbtn">전자결재 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/lists/A')">진행 중</div>
+                    <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/all')">내문서</div>
+                    <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/temp')">임시저장</div>
                 </div>
             </div>
-            <!-- 근무 -->
-            <div class="menu-item">근무 ▾
-                <div class="dropdown">
-                    <div onclick="go('https://hr-work.office.hiworks.com/personal/my-status/vacation')">휴가 현황</div>
-                    <div onclick="go('https://hr-work.office.hiworks.com/approval/vacation-apply')">휴가신청</div>
-                    <div onclick="go('https://hr-work.office.hiworks.com/approval/overwork')">연장근무</div>
-                    <div onclick="go('https://hr-work.office.hiworks.com/approval/work-holiday')">휴(무)일근무</div>
+            <div class="dropdown"><div class="dropbtn">근무 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/personal/my-status/vacation')">휴가 현황</div>
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/vacation-apply')">휴가신청</div>
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/overwork')">연장근무</div>
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/work-holiday')">휴(무)일근무</div>
                 </div>
             </div>
-            <!-- 예약 -->
-            <div class="menu-item">예약 ▾
-                <div class="dropdown">
-                    <div onclick="go('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/841')">회의실</div>
-                    <div onclick="go('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843')">차량</div>
-                    <div onclick="go('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/884')">노트북</div>
+            <div class="dropdown"><div class="dropbtn">예약 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/841')">회의실</div>
+                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843')">차량</div>
+                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/884')">노트북</div>
                 </div>
             </div>
-            <!-- 일정 -->
-            <div class="menu-item" onclick="go('https://scheduler.office.hiworks.com/calendar')">일정</div>
-            <!-- 게시판 -->
-            <div class="menu-item">게시판 ▾
-                <div class="dropdown">
-                    <div onclick="go('https://boards.office.hiworks.com/board/postlist/2540?page=1')">공지사항</div>
-                    <div onclick="go('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
+            <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
+            <div class="dropdown"><div class="dropbtn">게시판 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2540?page=1')">공지사항</div>
+                    <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
                 </div>
             </div>
         </div>
-        <div class="btn-ext" onclick="openNew()">외부 브라우저로 열기</div>
+        <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
     </div>
-
-    <iframe id="main-frame" src="https://mail.office.hiworks.com/daemo.co.kr/"></iframe>
+    
+    <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
 
     <script>
-        const frame = document.getElementById('main-frame');
-        function go(url) { frame.src = url; }
-        function openNew() { window.open(frame.src, '_blank'); }
+        const iframe = document.getElementById('content-frame');
+        function loadPage(url) { iframe.src = url; }
+        function openExternal() { window.open(iframe.src, '_blank'); }
     </script>
 </body>
 </html>
