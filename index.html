@@ -2,32 +2,87 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>하이웍스 통합 메뉴</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiworks 통합 포털</title>
     <style>
-        body { margin: 0; font-family: 'Malgun Gothic', sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        /* 상단 탭 영역 */
-        .tab-bar { display: flex; background: #333; padding: 10px; gap: 10px; }
-        .tab-item { color: white; padding: 10px 20px; cursor: pointer; border-radius: 5px; background: #444; }
-        .tab-item:hover { background: #ff7f00; }
-        /* 하단 iframe 영역 */
-        #content-frame { flex: 1; width: 100%; border: none; }
+        :root {
+            --brand-660c: #0067B1;      /* Primary Blue */
+            --brand-646c: #3E72A2;      /* Secondary Blue */
+            --brand-443c: #869896;      /* Muted Green */
+            --brand-7537c: #A4A696;     /* Muted Olive */
+            --cool-gray-4: #C1C2C2;     /* Neutral */
+            --black: #000000;
+            --gold: #C5A059;            /* Accent */
+            --silver: #D0D0D0;
+        }
+
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Malgun Gothic", sans-serif; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
+
+        .tab-bar { 
+            display: flex; 
+            background: var(--brand-660c); 
+            height: 40px; 
+            align-items: center; 
+            padding: 0 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-item { 
+            color: #ffffff; 
+            padding: 0 16px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            line-height: 40px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-item:hover { 
+            background: var(--brand-646c);
+        }
+
+        .tab-item.active { 
+            background: var(--brand-646c);
+            border-bottom: 2px solid var(--gold);
+            font-weight: 600;
+        }
+
+        #content-frame { 
+            flex: 1; 
+            width: 100%; 
+            border: none; 
+            background: #f8f9fa;
+        }
     </style>
 </head>
 <body>
     <div class="tab-bar">
-        <div class="tab-item" onclick="loadPage('https://mails.office.hiworks.com/')">메일</div>
-        <div class="tab-item" onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document')">전자결재</div>
-        <div class="tab-item" onclick="loadPage('https://boards.office.hiworks.com/board/postlist/recent')">게시판</div>
-        <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/')">일정</div>
-        <div class="tab-item" onclick="loadPage('https://team-mail.office.hiworks.com/')">공용메일</div>
-        <div class="tab-item" onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingMain')">예약</div>
-        <div class="tab-item" onclick="loadPage('https://hr-work.office.hiworks.com/')">근무</div>
+        <div class="tab-item active" onclick="loadPage(this, 'https://mails.office.hiworks.com/')">메일</div>
+        <div class="tab-item" onclick="loadPage(this, 'https://approval.office.hiworks.com/daemo.co.kr/approval/document')">전자결재</div>
+        <div class="tab-item" onclick="loadPage(this, 'https://boards.office.hiworks.com/board/postlist/recent')">게시판</div>
+        <div class="tab-item" onclick="loadPage(this, 'https://scheduler.office.hiworks.com/')">일정</div>
+        <div class="tab-item" onclick="loadPage(this, 'https://team-mail.office.hiworks.com/')">공용메일</div>
+        <div class="tab-item" onclick="loadPage(this, 'https://booking.office.hiworks.com/daemo.co.kr/booking/bookingMain')">예약</div>
+        <div class="tab-item" onclick="loadPage(this, 'https://hr-work.office.hiworks.com/')">근무</div>
     </div>
+    
     <iframe id="content-frame" src="https://mails.office.hiworks.com/"></iframe>
 
     <script>
-        function loadPage(url) {
+        function loadPage(element, url) {
             document.getElementById('content-frame').src = url;
+            
+            // UI State management
+            document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
         }
     </script>
 </body>
