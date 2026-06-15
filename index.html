@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hiworks 통합 포털</title>
     <style>
         :root {
@@ -11,7 +11,14 @@
             --gold: #C5A059;
         }
 
-        body { margin: 0; font-family: sans-serif; overflow: hidden; }
+        body { 
+            margin: 0; 
+            font-family: sans-serif; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; /* 전체 페이지의 스크롤은 차단 */
+        }
 
         .tab-container {
             display: flex;
@@ -20,21 +27,12 @@
             align-items: center;
             position: relative;
             z-index: 1000;
+            flex-shrink: 0;
         }
 
-        .tab-bar { 
-            display: flex; 
-            flex: 1;
-            height: 100%;
-        }
+        .tab-bar { display: flex; flex: 1; height: 100%; }
 
-        /* 드롭다운 스타일 */
-        .dropdown {
-            position: relative;
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
+        .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
 
         .dropbtn {
             color: #ffffff;
@@ -71,7 +69,6 @@
 
         .dropdown-content div:hover { background-color: #f1f1f1; }
 
-        /* 일반 탭 (일정 등) */
         .tab-item {
             display: flex;
             align-items: center;
@@ -83,7 +80,6 @@
         }
         .tab-item:hover { background: var(--brand-646c); }
 
-        /* 외부 브라우저 열기 버튼 */
         .btn-external {
             background: var(--gold);
             color: white;
@@ -99,16 +95,18 @@
 
         #content-frame { 
             width: 100%; 
-            height: calc(100vh - 45px); 
+            flex-grow: 1; /* 남은 화면을 꽉 채움 */
             border: none; 
             display: block;
+            /* 모바일 터치 스크롤 최적화 */
+            overflow: auto;
+            -webkit-overflow-scrolling: touch; 
         }
     </style>
 </head>
 <body>
     <div class="tab-container">
         <div class="tab-bar">
-            <!-- 메일 -->
             <div class="dropdown">
                 <div class="dropbtn">메일 ▾</div>
                 <div class="dropdown-content">
@@ -117,7 +115,6 @@
                 </div>
             </div>
 
-            <!-- 전자결재 -->
             <div class="dropdown">
                 <div class="dropbtn">전자결재 ▾</div>
                 <div class="dropdown-content">
@@ -127,7 +124,6 @@
                 </div>
             </div>
 
-            <!-- 근무 -->
             <div class="dropdown">
                 <div class="dropbtn">근무 ▾</div>
                 <div class="dropdown-content">
@@ -138,7 +134,6 @@
                 </div>
             </div>
 
-            <!-- 예약 -->
             <div class="dropdown">
                 <div class="dropbtn">예약 ▾</div>
                 <div class="dropdown-content">
@@ -148,10 +143,8 @@
                 </div>
             </div>
 
-            <!-- 일정 -->
             <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
 
-            <!-- 게시판 -->
             <div class="dropdown">
                 <div class="dropbtn">게시판 ▾</div>
                 <div class="dropdown-content">
@@ -164,7 +157,10 @@
         <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
     </div>
     
-    <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
+    <iframe id="content-frame" 
+            src="https://login.office.hiworks.com/daemo.co.kr" 
+            sandbox="allow-forms allow-scripts allow-same-origin allow-popups"
+            scrolling="yes"></iframe>
 
     <script>
         const iframe = document.getElementById('content-frame');
