@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teams in Daemo Hiworks</title>
+    <title>Hiworks 통합 포털</title>
     <style>
         :root {
             --brand-660c: #0067B1;
@@ -18,39 +18,84 @@
             background: var(--brand-660c);
             height: 45px;
             align-items: center;
+            position: relative;
+            z-index: 1000;
         }
 
         .tab-bar { 
             display: flex; 
-            overflow-x: auto;
-            white-space: nowrap;
             flex: 1;
-            -webkit-overflow-scrolling: touch;
+            height: 100%;
         }
 
-        .tab-item-wrapper {
+        /* 드롭다운 스타일 */
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .dropbtn {
+            color: #ffffff;
+            padding: 0 15px;
+            cursor: pointer;
+            font-size: 14px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown:hover { background: var(--brand-646c); }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 45px;
+            left: 0;
+            background-color: white;
+            min-width: 140px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 2000;
+        }
+
+        .dropdown:hover .dropdown-content { display: block; }
+
+        .dropdown-content div {
+            color: var(--brand-660c);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dropdown-content div:hover { background-color: #f1f1f1; }
+
+        /* 일반 탭 (일정 등) */
+        .tab-item {
             display: flex;
             align-items: center;
             color: #ffffff;
-            padding: 0 10px 0 15px;
+            padding: 0 15px;
             cursor: pointer;
             font-size: 14px;
-            line-height: 45px;
-            position: relative;
+            height: 100%;
         }
+        .tab-item:hover { background: var(--brand-646c); }
 
-        .tab-item-wrapper:hover { background: var(--brand-646c); }
-        .tab-item-wrapper.active { background: var(--brand-646c); border-bottom: 2px solid var(--gold); }
-
-        .external-icon {
-            display: none;
-            margin-left: 8px;
-            width: 14px;
-            height: 14px;
-            opacity: 0.7;
+        /* 외부 브라우저 열기 버튼 */
+        .btn-external {
+            background: var(--gold);
+            color: white;
+            padding: 0 12px;
+            font-size: 12px;
+            cursor: pointer;
+            line-height: 30px;
+            margin: 0 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-weight: bold;
         }
-        .tab-item-wrapper:hover .external-icon { display: block; }
-        .external-icon:hover { opacity: 1; transform: scale(1.1); }
 
         #content-frame { 
             width: 100%; 
@@ -62,37 +107,61 @@
 </head>
 <body>
     <div class="tab-container">
-        <div class="tab-bar" id="tab-bar">
-            <!-- 탭 항목 반복 구조 -->
-            <div class="tab-item-wrapper active" onclick="loadPage(this, 'https://mail.office.hiworks.com/daemo.co.kr/')">
-                <span>메일</span>
-                <img src="https://cdn-icons-png.flaticon.com/512/32/32338.png" class="external-icon" onclick="event.stopPropagation(); window.open('https://mail.office.hiworks.com/daemo.co.kr/', '_blank')">
+        <div class="tab-bar">
+            <!-- 메일 -->
+            <div class="dropdown">
+                <div class="dropbtn">메일 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://mail.office.hiworks.com/daemo.co.kr/')">개인메일</div>
+                    <div onclick="loadPage('https://team-mail.office.hiworks.com/')">공용메일</div>
+                </div>
             </div>
-            <div class="tab-item-wrapper" onclick="loadPage(this, 'https://team-mail.office.hiworks.com/')">
-                <span>공용메일</span>
-                <img src="https://cdn-icons-png.flaticon.com/512/32/32338.png" class="external-icon" onclick="event.stopPropagation(); window.open('https://team-mail.office.hiworks.com/', '_blank')">
+
+            <!-- 전자결재 -->
+            <div class="dropdown">
+                <div class="dropbtn">전자결재 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/lists/A')">진행 중</div>
+                    <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/all')">내문서</div>
+                    <div onclick="loadPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/temp')">임시저장</div>
+                </div>
             </div>
-            <div class="tab-item-wrapper" onclick="loadPage(this, 'https://approval.office.hiworks.com/daemo.co.kr/approval/document')">
-                <span>전자결재</span>
-                <img src="https://cdn-icons-png.flaticon.com/512/32/32338.png" class="external-icon" onclick="event.stopPropagation(); window.open('https://approval.office.hiworks.com/daemo.co.kr/approval/document', '_blank')">
+
+            <!-- 근무 -->
+            <div class="dropdown">
+                <div class="dropbtn">근무 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/personal/my-status/vacation')">휴가 현황</div>
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/vacation-apply')">휴가신청</div>
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/overwork')">연장근무</div>
+                    <div onclick="loadPage('https://hr-work.office.hiworks.com/approval/work-holiday')">휴(무)일근무</div>
+                </div>
             </div>
-            <div class="tab-item-wrapper" onclick="loadPage(this, 'https://hr-work.office.hiworks.com/personal/index')">
-                <span>근무</span>
-                <img src="https://cdn-icons-png.flaticon.com/512/32/32338.png" class="external-icon" onclick="event.stopPropagation(); window.open('https://hr-work.office.hiworks.com/personal/index', '_blank')">
+
+            <!-- 예약 -->
+            <div class="dropdown">
+                <div class="dropbtn">예약 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/841')">회의실</div>
+                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843')">차량</div>
+                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/884')">노트북</div>
+                </div>
             </div>
-            <div class="tab-item-wrapper" onclick="loadPage(this, 'https://booking.office.hiworks.com/daemo.co.kr/booking/bookingMain')">
-                <span>예약</span>
-                <img src="https://cdn-icons-png.flaticon.com/512/32/32338.png" class="external-icon" onclick="event.stopPropagation(); window.open('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingMain', '_blank')">
-            </div>
-            <div class="tab-item-wrapper" onclick="loadPage(this, 'https://scheduler.office.hiworks.com/calendar')">
-                <span>일정</span>
-                <img src="https://cdn-icons-png.flaticon.com/512/32/32338.png" class="external-icon" onclick="event.stopPropagation(); window.open('https://scheduler.office.hiworks.com/calendar', '_blank')">
-            </div>
-            <div class="tab-item-wrapper" onclick="loadPage(this, 'https://boards.office.hiworks.com/board/postlist/recent?page=1')">
-                <span>게시판</span>
-                <img src="https://cdn-icons-png.flaticon.com/512/32/32338.png" class="external-icon" onclick="event.stopPropagation(); window.open('https://boards.office.hiworks.com/board/postlist/recent?page=1', '_blank')">
+
+            <!-- 일정 -->
+            <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
+
+            <!-- 게시판 -->
+            <div class="dropdown">
+                <div class="dropbtn">게시판 ▾</div>
+                <div class="dropdown-content">
+                    <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2540?page=1')">공지사항</div>
+                    <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
+                </div>
             </div>
         </div>
+        
+        <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
     </div>
     
     <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
@@ -100,11 +169,13 @@
     <script>
         const iframe = document.getElementById('content-frame');
 
-        function loadPage(element, url) {
+        function loadPage(url) {
             iframe.src = url;
-            document.querySelectorAll('.tab-item-wrapper').forEach(item => item.classList.remove('active'));
-            element.classList.add('active');
             iframe.focus();
+        }
+
+        function openExternal() {
+            window.open(iframe.src, '_blank');
         }
     </script>
 </body>
