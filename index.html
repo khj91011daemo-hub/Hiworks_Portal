@@ -13,19 +13,27 @@
 
         body { margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
+        /* 탭 컨테이너 자체를 overflow: visible로 설정하여 내부 메뉴가 잘리지 않게 함 */
         .tab-container {
             display: flex;
             background: var(--brand-660c);
             height: 45px;
             align-items: center;
             position: relative;
-            z-index: 999; /* 안전한 수치 */
+            z-index: 1000;
             padding: 0 5px;
+            overflow: visible;
         }
 
-        .tab-bar { display: flex; height: 100%; overflow-x: auto; flex: 1; align-items: center; }
+        .tab-bar { 
+            display: flex; 
+            height: 100%; 
+            flex: 1; 
+            align-items: center;
+            overflow: visible; /* 잘리지 않게 visible로 변경 */
+        }
 
-        .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
+        .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
 
         .dropbtn {
             color: #ffffff; padding: 0 15px; cursor: pointer; font-size: 14px;
@@ -34,7 +42,6 @@
 
         .dropdown:hover { background: var(--brand-646c); }
 
-        /* 드롭다운이 아이프레임 위에 뜨도록 z-index만 강화 */
         .dropdown-content {
             display: none;
             position: absolute;
@@ -42,8 +49,9 @@
             left: 0;
             background-color: white;
             min-width: 140px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            z-index: 9999; /* 매우 높게 설정 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 9999;
+            border-radius: 0 0 4px 4px;
         }
 
         .dropdown:hover .dropdown-content { display: block; }
@@ -65,6 +73,7 @@
             background: var(--gold); color: white; padding: 0 10px; font-size: 12px;
             cursor: pointer; height: 28px; display: flex; align-items: center;
             margin: 0 5px; border-radius: 4px; white-space: nowrap; font-weight: bold;
+            flex-shrink: 0;
         }
 
         #content-frame { 
@@ -78,7 +87,6 @@
 <body>
     <div class="tab-container">
         <div class="tab-bar">
-            <!-- 기존 메뉴 구조 동일 -->
             <div class="dropdown"><div class="dropbtn">메일 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://mail.office.hiworks.com/daemo.co.kr/')">개인메일</div>
@@ -115,7 +123,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
     </div>
     
