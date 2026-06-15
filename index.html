@@ -16,12 +16,13 @@
 
         .tab-container {
             display: flex; background: var(--brand-660c); height: 45px;
-            align-items: center; position: relative; z-index: 1000; flex-shrink: 0;
-            justify-content: space-between; /* 탭바와 우측 버튼 분리 */
+            align-items: center; position: relative; z-index: 9999; /* 최상위 유지 */
+            flex-shrink: 0; justify-content: space-between;
         }
 
-        .tab-bar { display: flex; height: 100%; overflow-x: auto; }
+        .tab-bar { display: flex; height: 100%; overflow-x: auto; flex: 1; }
 
+        /* 드롭다운 부모는 relative */
         .dropdown { position: relative; display: flex; align-items: center; height: 100%; }
 
         .dropbtn {
@@ -31,17 +32,18 @@
 
         .dropdown:hover { background: var(--brand-646c); }
 
+        /* 핵심: 메뉴가 탭바 내부에서 잘리지 않고 항상 위에 뜨도록 설정 */
         .dropdown-content {
             display: none; position: absolute; top: 45px; left: 0;
             background-color: white; min-width: 140px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2); z-index: 2000;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3); z-index: 10000; /* 아이프레임보다 확실히 위 */
         }
 
         .dropdown:hover .dropdown-content { display: block; }
 
         .dropdown-content div {
-            color: var(--brand-660c); padding: 10px 15px; cursor: pointer;
-            font-size: 13px; border-bottom: 1px solid #eee;
+            color: var(--brand-660c); padding: 12px 15px; cursor: pointer;
+            font-size: 13px; border-bottom: 1px solid #eee; white-space: nowrap;
         }
 
         .dropdown-content div:hover { background-color: #f1f1f1; }
@@ -52,19 +54,16 @@
         }
         .tab-item:hover { background: var(--brand-646c); }
 
-        /* 기존 외부 버튼 스타일 유지 */
         .btn-external {
-            background: var(--gold); color: white; padding: 0 12px; font-size: 12px;
-            cursor: pointer; line-height: 30px; margin: 0 5px; border-radius: 4px;
+            background: var(--gold); color: white; padding: 0 10px; font-size: 12px;
+            cursor: pointer; line-height: 28px; margin: 0 3px; border-radius: 4px;
             white-space: nowrap; font-weight: bold;
         }
-        
-        /* 이전 버튼용 스타일 */
         .btn-back { background: var(--gray); }
 
         #content-frame { 
             width: 100%; flex-grow: 1; border: none; display: block;
-            overflow: auto; -webkit-overflow-scrolling: touch; 
+            z-index: 1; /* 아이프레임은 항상 아래 */
         }
     </style>
 </head>
@@ -113,7 +112,7 @@
             </div>
         </div>
         
-        <div style="display: flex; margin-right: 10px;">
+        <div style="display: flex; margin-right: 5px;">
             <div class="btn-external btn-back" onclick="goBack()">이전</div>
             <div class="btn-external" onclick="openExternal()">외부</div>
         </div>
@@ -126,22 +125,10 @@
 
     <script>
         const iframe = document.getElementById('content-frame');
-
-        function loadPage(url) {
-            iframe.src = url;
-            iframe.focus();
-        }
-
-        function openExternal() {
-            window.open(iframe.src, '_blank');
-        }
-
-        function goBack() {
-            try {
-                iframe.contentWindow.history.back();
-            } catch (e) {
-                console.log("이전 페이지로 이동 불가");
-            }
+        function loadPage(url) { iframe.src = url; }
+        function openExternal() { window.open(iframe.src, '_blank'); }
+        function goBack() { 
+            try { iframe.contentWindow.history.back(); } catch (e) { console.log("이동 불가"); } 
         }
     </script>
 </body>
