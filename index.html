@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>DAEMO Hiworks Connector v2.3.0</title>
+    <title>DAEMO Hiworks Connector v2.3.1</title>
     <style>
         :root {
             --brand-660c: #0067B1;
@@ -12,7 +12,7 @@
             --sidebar-width: 280px;
         }
 
-        body { margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        body { margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; background: #fff; }
 
         .tab-container {
             display: flex;
@@ -22,19 +22,18 @@
             position: relative;
             z-index: 1000;
             padding: 0 5px;
-            overflow-x: auto;
-            overflow-y: visible;
-            white-space: nowrap;
+            box-sizing: border-box;
+            width: 100%;
         }
 
-        .tab-container::-webkit-scrollbar { height: 3px; }
-        .tab-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
-
+        /* 왼쪽 고정 기본 메뉴 바 */
         .tab-bar { 
             display: flex; 
             height: 100%; 
             align-items: center;
-            gap: 2px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1002;
         }
 
         .dropdown { position: relative; height: 100%; display: flex; align-items: center; }
@@ -73,10 +72,24 @@
         }
         .tab-item:hover { background: var(--brand-646c); }
 
-        /* 동적 추가되는 내부 탭 스타일 */
+        /* 중앙 동적 탭 영역 (스크롤 가능) */
+        #dynamic-tabs-area {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-grow: 1;
+            height: 100%;
+            padding: 0 8px;
+            white-space: nowrap;
+        }
+        #dynamic-tabs-area::-webkit-scrollbar { height: 3px; }
+        #dynamic-tabs-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 3px; }
+
         .dynamic-tab {
-            display: flex; align-items: center; background: #2C5282; color: #ffffff;
-            padding: 0 10px; height: 32px; border-radius: 4px; font-size: 12px;
+            display: inline-flex; align-items: center; background: #2C5282; color: #ffffff;
+            padding: 0 10px; height: 30px; border-radius: 4px; font-size: 12px;
             cursor: pointer; gap: 6px; border: 1px solid rgba(255,255,255,0.2);
             flex-shrink: 0;
         }
@@ -87,10 +100,11 @@
         }
         .dynamic-tab .close-btn:hover { background: rgba(0,0,0,0.2); opacity: 1; }
 
-        /* 우측 컨트롤 영역 고정 */
+        /* 우측 고정 컨트롤 영역 */
         .controls-group {
-            display: flex; align-items: center; margin-left: auto; padding-left: 10px; gap: 8px; flex-shrink: 0;
-            background: var(--brand-660c); position: sticky; right: 0; z-index: 1001;
+            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+            padding-left: 5px; background: var(--brand-660c);
+            z-index: 1002;
         }
 
         /* 안드로이드 스타일 토글 스위치 */
@@ -116,7 +130,6 @@
             flex-grow: 1;
             overflow: hidden;
             position: relative;
-            background: #fff;
         }
 
         .content-frame { 
@@ -148,9 +161,9 @@
     </style>
 </head>
 <body>
-    <div class="tab-container" id="tab-container">
-        <div class="tab-bar" id="main-tab-bar">
-            <!-- 기존 기본 메뉴 구조 -->
+    <div class="tab-container">
+        <!-- 1. 고정 기본 메뉴 바 -->
+        <div class="tab-bar">
             <div class="dropdown"><div class="dropbtn">메일 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="openPage('https://mail.office.hiworks.com/daemo.co.kr/', '개인메일')">개인메일</div>
@@ -159,9 +172,9 @@
             </div>
             <div class="dropdown"><div class="dropbtn">전자결재 ▾</div>
                 <div class="dropdown-content">
-                    <div onclick="openPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/lists/A', '진행 중 결재')">진행 중</div>
-                    <div onclick="openPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/all', '내문서함')">내문서</div>
-                    <div onclick="openPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/temp', '임시저장함')">임시저장</div>
+                    <div onclick="openPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/lists/A', '진행 중')">진행 중</div>
+                    <div onclick="openPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/all', '내문서')">내문서</div>
+                    <div onclick="openPage('https://approval.office.hiworks.com/daemo.co.kr/approval/document/box/temp', '임시저장')">임시저장</div>
                 </div>
             </div>
             <div class="dropdown"><div class="dropbtn">근무 ▾</div>
@@ -169,14 +182,14 @@
                     <div onclick="openPage('https://hr-work.office.hiworks.com/personal/my-status/vacation', '휴가 현황')">휴가 현황</div>
                     <div onclick="openPage('https://hr-work.office.hiworks.com/approval/vacation-apply', '휴가신청')">휴가신청</div>
                     <div onclick="openPage('https://hr-work.office.hiworks.com/approval/overwork', '연장근무')">연장근무</div>
-                    <div onclick="openPage('https://hr-work.office.hiworks.com/approval/work-holiday', '휴일근무')">휴(무)일근무</div>
+                    <div onclick="openPage('https://hr-work.office.hiworks.com/approval/work-holiday', '휴(무)일근무')">휴(무)일근무</div>
                 </div>
             </div>
             <div class="dropdown"><div class="dropbtn">예약 ▾</div>
                 <div class="dropdown-content">
-                    <div onclick="openPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/841', '회의실 예약')">회의실</div>
-                    <div onclick="openPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/884', '노트북 예약')">노트북</div>
-                    <div onclick="openPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843', '차량 예약')">차량</div>
+                    <div onclick="openPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/841', '회의실')">회의실</div>
+                    <div onclick="openPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/884', '노트북')">노트북</div>
+                    <div onclick="openPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843', '차량')">차량</div>
                 </div>
             </div>
             <div class="tab-item" onclick="openPage('https://scheduler.office.hiworks.com/calendar', '일정')">일정</div>
@@ -188,10 +201,10 @@
             </div>
         </div>
 
-        <!-- 동적 탭들이 생성될 공간 -->
-        <div id="dynamic-tabs-area" style="display: flex; gap: 4px; margin-left: 5px;"></div>
+        <!-- 2. 추가되는 동적 탭들이 들어가는 공간 (가로 스크롤 지원) -->
+        <div id="dynamic-tabs-area"></div>
 
-        <!-- 우측 고정 컨트롤 영역 -->
+        <!-- 3. 우측 컨트롤 영역 (사이드바 토글 및 외부열기) -->
         <div class="controls-group">
             <div class="toggle-container">
                 <label class="switch">
@@ -204,9 +217,7 @@
         </div>
     </div>
     
-    <div id="frame-wrapper" class="frame-wrapper">
-        <!-- 아이프레임들이 동적으로 생성 및 관리됨 (sandbox에서 popups 권한 제거하여 외부 새창 원천 차단) -->
-    </div>
+    <div id="frame-wrapper" class="frame-wrapper"></div>
 
     <!-- 우하단 줌 컨트롤 -->
     <div class="zoom-controls">
@@ -219,17 +230,16 @@
         const dynamicTabsArea = document.getElementById('dynamic-tabs-area');
         const statusText = document.getElementById('status-text');
         
-        let tabs = []; // [{id, url, title}]
+        let tabs = [];
         let activeTabId = null;
         let currentScale = 1.0;
         let tabCounter = 0;
 
-        // 초기 앱 실행 시 기본 페이지 로드 (저장된 URL 또는 로그인 페이지)
+        // 초기 앱 실행 시 기본 페이지 로드
         const savedUrl = localStorage.getItem('hiworks_last_url') || 'https://login.office.hiworks.com/daemo.co.kr';
         openPage(savedUrl, '포털 메인');
 
         function openPage(url, title) {
-            // 이미 동일한 URL이 열려있는지 확인 후 활성화
             let existingTab = tabs.find(t => t.url === url);
             if (existingTab) {
                 switchTab(existingTab.id);
@@ -241,14 +251,13 @@
             
             tabs.push({ id: tabId, url: url, title: title || '페이지' });
 
-            // 1. iframe 생성 (sandbox에서 popups 제거하여 외부 새창 팝업 원천 차단)
             const iframe = document.createElement('iframe');
             iframe.id = tabId;
             iframe.className = 'content-frame';
             iframe.src = url;
+            // 외부 새창 팝업 원천 차단 유지
             iframe.setAttribute('sandbox', 'allow-forms allow-scripts allow-same-origin allow-modals allow-downloads allow-storage-access-by-user-activation');
             
-            // 내부 링크 클릭 감지 가로채기 (새창 방지 및 앱 내 탭화)
             iframe.onload = function() {
                 try {
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
@@ -262,23 +271,19 @@
                             }
                         });
                     });
-                } catch(e) {
-                    // CORS 보안 제약으로 하이웍스 외부 도메인 내부 DOM 직접 제어는 막힐 수 있으나 sandbox가 새창을 막아줌
-                }
+                } catch(e) {}
             };
 
             frameWrapper.appendChild(iframe);
 
-            // 2. 상단 동적 탭 버튼 생성
             const tabEl = document.createElement('div');
             tabEl.className = 'dynamic-tab';
             tabEl.id = 'btn-' + tabId;
-            tabEl.innerHTML = `<span onclick="switchTab('${tabId}')" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${title}</span><span class="close-btn" onclick="closeTab(event, '${tabId}')">&times;</span>`;
+            tabEl.innerHTML = `<span onclick="switchTab('${tabId}')" style="max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${title}</span><span class="close-btn" onclick="closeTab(event, '${tabId}')">&times;</span>`;
             dynamicTabsArea.appendChild(tabEl);
 
             switchTab(tabId);
 
-            // 마지막 URL 저장
             try {
                 localStorage.setItem('hiworks_last_url', url);
             } catch(e) {}
@@ -287,7 +292,6 @@
         function switchTab(tabId) {
             activeTabId = tabId;
 
-            // 모든 iframe 및 탭 버튼 활성/비활성화 처리
             document.querySelectorAll('.content-frame').forEach(f => f.classList.remove('active'));
             document.querySelectorAll('.dynamic-tab').forEach(t => t.classList.remove('active'));
 
@@ -295,9 +299,11 @@
             const targetBtn = document.getElementById('btn-' + tabId);
 
             if (targetIframe) targetIframe.classList.add('active');
-            if (targetBtn) targetBtn.classList.add('active');
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+                targetBtn.scrollIntoView({ behavior: 'smooth', inline: 'nearest' });
+            }
 
-            // 현재 활성 탭의 URL 저장
             const currentTabObj = tabs.find(t => t.id === tabId);
             if (currentTabObj) {
                 try {
@@ -312,7 +318,6 @@
             const tabIndex = tabs.findIndex(t => t.id === tabId);
             if (tabIndex === -1) return;
 
-            // DOM 요소 제거
             const targetIframe = document.getElementById(tabId);
             const targetBtn = document.getElementById('btn-' + tabId);
             if (targetIframe) targetIframe.remove();
@@ -320,13 +325,11 @@
 
             tabs.splice(tabIndex, 1);
 
-            // 만약 닫은 탭이 현재 보고 있던 탭이었다면 다른 탭으로 포커스 이동
             if (activeTabId === tabId) {
                 if (tabs.length > 0) {
                     const nextTab = tabs[tabs.length - 1];
                     switchTab(nextTab.id);
                 } else {
-                    // 모든 탭이 닫히면 기본 메인 페이지 오픈
                     openPage('https://login.office.hiworks.com/daemo.co.kr', '로그인');
                 }
             }
