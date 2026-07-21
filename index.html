@@ -71,10 +71,20 @@
 
         /* 세션 배지 */
         .session-badge {
-            display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.15);
-            color: #e0f2fe; padding: 4px 10px; border-radius: 12px; font-size: 11px; white-space: nowrap; margin-left: 5px;
+            display: flex; align-items: center; gap: 6px; 
+            background: #10B981; color: #ffffff; 
+            padding: 4px 10px; border-radius: 14px; 
+            font-size: 12px; font-weight: bold; white-space: nowrap; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin: 0 5px;
         }
-        .session-dot { width: 7px; height: 7px; background-color: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10b981; }
+        .session-dot { width: 8px; height: 8px; background-color: #ffffff; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
 
         /* 안드로이드 스타일 토글 스위치 */
         .toggle-container {
@@ -129,6 +139,59 @@
             backdrop-filter: blur(4px); transition: background 0.2s;
         }
         .zoom-controls button:active { background: rgba(0, 0, 0, 0.7); }
+
+        /* 사전 로그인 안내 모달 */
+        .login-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .login-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .login-modal-box {
+            background: #ffffff;
+            width: 420px;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .login-modal-box h3 {
+            margin-top: 0;
+            color: #0067B1;
+            font-size: 20px;
+        }
+        .login-modal-box p {
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 15px 0 25px;
+        }
+        .btn-login-start {
+            background: #0067B1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn-login-start:hover {
+            background: #00528e;
+        }
     </style>
 </head>
 <body>
@@ -170,10 +233,11 @@
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
                 </div>
             </div>
-            
-            <div class="session-badge" title="자동 세션 유지 핑(3분 주기) 동작 중">
-                <span class="session-dot"></span> 로그인 유지 중
-            </div>
+        </div>
+
+        <!-- 세션 자동 연장 가동 배지 -->
+        <div class="session-badge" title="로그인 후 세션이 끊기지 않도록 3분마다 백그라운드로 자동 연장합니다">
+            <span class="session-dot"></span> 세션 자동 연장
         </div>
 
         <!-- 안드로이드 스타일 토글 스위치 -->
@@ -185,6 +249,7 @@
             <span id="status-text">사이드바 켬</span>
         </div>
         
+        <div class="btn-external" style="background: #10B981;" onclick="openLoginPopup()" title="최초 1회 로그인 팝업을 열어 아이디/비밀번호 및 영구 세션을 보관합니다">🔑 1회 사전 로그인</div>
         <div class="btn-external" onclick="openExternal()">외부에서 열기</div>
     </div>
     
@@ -198,10 +263,20 @@
         <button onclick="changeZoom(0.1)">+</button>
     </div>
 
+    <!-- 최초 사전 로그인 안내 대형 모달 -->
+    <div id="login-modal" class="login-modal-overlay">
+        <div class="login-modal-box">
+            <h3>🔑 하이웍스 사전 로그인</h3>
+            <p>팀즈 앱 내에서 로그인 상태를 유지하려면<br><strong>최초 1회 사전 로그인</strong>이 필요합니다.<br><br>아래 버튼을 눌러 로그인을 완료해주세요.</p>
+            <button class="btn-login-start" onclick="openLoginPopup()">사전 로그인 시작하기</button>
+        </div>
+    </div>
+
     <script>
         const iframe = document.getElementById('content-frame');
         const frameWrapper = document.getElementById('frame-wrapper');
         const statusText = document.getElementById('status-text');
+        const loginModal = document.getElementById('login-modal');
         let currentScale = 1.0;
 
         // 저장된 마지막 URL 복원
@@ -216,6 +291,54 @@
                 localStorage.setItem('hiworks_last_url', url);
             } catch(e) {}
         }
+
+        // ==========================================
+        // 🔑 1회 사전 로그인 팝업 (1st-Party Cookie 발급)
+        // ==========================================
+        function openLoginPopup(isAuto = false) {
+            const width = 520;
+            const height = 660;
+            const left = Math.max(0, (window.screen.width - width) / 2);
+            const top = Math.max(0, (window.screen.height - height) / 2);
+            
+            const popup = window.open(
+                'https://login.office.hiworks.com/daemo.co.kr',
+                'HiworksLoginPopup',
+                `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+            );
+
+            if (!popup) {
+                // 브라우저 팝업 차단 시 모달 안내창 표시
+                loginModal.classList.add('active');
+                return false;
+            }
+
+            // 팝업 성공적으로 열림 -> 모달 숨김
+            loginModal.classList.remove('active');
+
+            // 팝업이 닫히면(로그인 완료 시) iframe을 메인 포털로 새로고침 및 로그인 상태 기록
+            const timer = setInterval(() => {
+                if (!popup || popup.closed) {
+                    clearInterval(timer);
+                    localStorage.setItem('hiworks_logged_in', 'true');
+                    const targetUrl = localStorage.getItem('hiworks_last_url') || 'https://mail.office.hiworks.com/daemo.co.kr/';
+                    iframe.src = targetUrl;
+                }
+            }, 1000);
+
+            return true;
+        }
+
+        // 앱 처음 실행 시 자동 사전 로그인 팝업 시도
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const isLogged = localStorage.getItem('hiworks_logged_in');
+                if (!isLogged) {
+                    // 최초 실행 시 사전 로그인 팝업 자동 실행
+                    openLoginPopup(true);
+                }
+            }, 600);
+        });
         
         function openExternal() { 
             window.open(iframe.src, '_blank'); 
