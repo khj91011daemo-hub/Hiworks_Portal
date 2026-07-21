@@ -249,7 +249,7 @@
             <span id="status-text">사이드바 켬</span>
         </div>
         
-        <div class="btn-external" style="background: #10B981;" onclick="openLoginPopup()" title="최초 1회 로그인 팝업을 열어 아이디/비밀번호 및 영구 세션을 보관합니다">🔑 1회 사전 로그인</div>
+        <div class="btn-external" style="background: #10B981;" onclick="openLoginPopup()" title="로그인 화면으로 이동합니다">🔑 1회 로그인</div>
         <div class="btn-external" onclick="openExternal()">외부에서 열기</div>
     </div>
     
@@ -266,9 +266,9 @@
     <!-- 최초 사전 로그인 안내 대형 모달 -->
     <div id="login-modal" class="login-modal-overlay">
         <div class="login-modal-box">
-            <h3>🔑 하이웍스 사전 로그인</h3>
-            <p>팀즈 앱 내에서 로그인 상태를 유지하려면<br><strong>최초 1회 사전 로그인</strong>이 필요합니다.<br><br>아래 버튼을 눌러 로그인을 완료해주세요.</p>
-            <button class="btn-login-start" onclick="openLoginPopup()">사전 로그인 시작하기</button>
+            <h3>🔑 하이웍스 로그인</h3>
+            <p>팀즈 앱 내에서 로그인 상태를 유지하려면<br><strong>로그인</strong>이 필요합니다.<br><br>아래 버튼을 눌러 로그인 화면으로 이동해주세요.</p>
+            <button class="btn-login-start" onclick="openLoginPopup()">로그인 화면으로 이동</button>
         </div>
     </div>
 
@@ -293,49 +293,19 @@
         }
 
         // ==========================================
-        // 🔑 1회 사전 로그인 팝업 (1st-Party Cookie 발급)
+        // 🔑 팝업 대신 iframe 내부에서 직접 로그인 진행하도록 수정
         // ==========================================
-        function openLoginPopup(isAuto = false) {
-            const width = 520;
-            const height = 660;
-            const left = Math.max(0, (window.screen.width - width) / 2);
-            const top = Math.max(0, (window.screen.height - height) / 2);
-            
-            const popup = window.open(
-                'https://login.office.hiworks.com/daemo.co.kr',
-                'HiworksLoginPopup',
-                `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
-            );
-
-            if (!popup) {
-                // 브라우저 팝업 차단 시 모달 안내창 표시
-                loginModal.classList.add('active');
-                return false;
-            }
-
-            // 팝업 성공적으로 열림 -> 모달 숨김
+        function openLoginPopup() {
             loginModal.classList.remove('active');
-
-            // 팝업이 닫히면(로그인 완료 시) iframe을 메인 포털로 새로고침 및 로그인 상태 기록
-            const timer = setInterval(() => {
-                if (!popup || popup.closed) {
-                    clearInterval(timer);
-                    localStorage.setItem('hiworks_logged_in', 'true');
-                    const targetUrl = localStorage.getItem('hiworks_last_url') || 'https://mail.office.hiworks.com/daemo.co.kr/';
-                    iframe.src = targetUrl;
-                }
-            }, 1000);
-
-            return true;
+            loadPage('https://login.office.hiworks.com/daemo.co.kr');
         }
 
-        // 앱 처음 실행 시 자동 사전 로그인 팝업 시도
+        // 앱 처음 실행 시 로그인 여부 확인 모달 표시
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const isLogged = localStorage.getItem('hiworks_logged_in');
                 if (!isLogged) {
-                    // 최초 실행 시 사전 로그인 팝업 자동 실행
-                    openLoginPopup(true);
+                    loginModal.classList.add('active');
                 }
             }, 600);
         });
