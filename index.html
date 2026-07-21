@@ -249,7 +249,7 @@
             <span id="status-text">사이드바 켬</span>
         </div>
         
-        <div class="btn-external" style="background: #10B981;" onclick="openLoginPopup()" title="로그인 화면으로 이동합니다">🔑 1회 로그인</div>
+        <div class="btn-external" style="background: #10B981;" onclick="goToLogin()" title="로그인 화면으로 이동합니다">🔑 로그인 화면</div>
         <div class="btn-external" onclick="openExternal()">외부에서 열기</div>
     </div>
     
@@ -266,9 +266,9 @@
     <!-- 최초 사전 로그인 안내 대형 모달 -->
     <div id="login-modal" class="login-modal-overlay">
         <div class="login-modal-box">
-            <h3>🔑 하이웍스 로그인</h3>
-            <p>팀즈 앱 내에서 로그인 상태를 유지하려면<br><strong>로그인</strong>이 필요합니다.<br><br>아래 버튼을 눌러 로그인 화면으로 이동해주세요.</p>
-            <button class="btn-login-start" onclick="openLoginPopup()">로그인 화면으로 이동</button>
+            <h3>🔑 하이웍스 로그인 안내</h3>
+            <p>팀즈 앱 내에서 바로 로그인을 진행해주세요.<br><br>아래 버튼을 누르면 로그인 화면으로 이동합니다.</p>
+            <button class="btn-login-start" onclick="closeLoginModal()">로그인 시작하기</button>
         </div>
     </div>
 
@@ -293,14 +293,19 @@
         }
 
         // ==========================================
-        // 🔑 팝업 대신 iframe 내부에서 직접 로그인 진행하도록 수정
+        // 🔑 외부 팝업 창 대신 현재 iframe 안에서 로그인 화면 이동 및 모달 닫기
         // ==========================================
-        function openLoginPopup() {
+        function goToLogin() {
             loginModal.classList.remove('active');
             loadPage('https://login.office.hiworks.com/daemo.co.kr');
         }
 
-        // 앱 처음 실행 시 로그인 여부 확인 모달 표시
+        function closeLoginModal() {
+            loginModal.classList.remove('active');
+            loadPage('https://login.office.hiworks.com/daemo.co.kr');
+        }
+
+        // 앱 처음 실행 시 로그인 모달 표시 (외부 팝업 호출 안 함)
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const isLogged = localStorage.getItem('hiworks_logged_in');
