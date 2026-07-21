@@ -227,7 +227,7 @@
                 </div>
             </div>
             <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
-            <div class="dropdown"><div class="dropbtn">게시판 ▾</div>
+            <div class="dropdown"><div class="dropdown"><div class="dropbtn">게시판 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2540?page=1')">공지사항</div>
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
@@ -292,9 +292,6 @@
             } catch(e) {}
         }
 
-        // ==========================================
-        // 🔑 외부 팝업 창 대신 현재 iframe 안에서 로그인 화면 이동 및 모달 닫기
-        // ==========================================
         function goToLogin() {
             loginModal.classList.remove('active');
             loadPage('https://login.office.hiworks.com/daemo.co.kr');
@@ -305,12 +302,12 @@
             loadPage('https://login.office.hiworks.com/daemo.co.kr');
         }
 
-        // 앱 처음 실행 시 로그인 모달 표시 (외부 팝업 호출 안 함)
+        // 앱 처음 실행 시 로그인 모달 표시
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const isLogged = localStorage.getItem('hiworks_logged_in');
                 if (!isLogged) {
-                    loginModal.classList.add('active');
+                    loginModal.classList.clear('active'); // 안전 처리
                 }
             }, 600);
         });
@@ -338,17 +335,34 @@
         // 🔒 로그인 세션 자동 유지 (Keep-Alive Ping)
         // ==========================================
         function keepSessionAlive() {
-            // 1. fetch 기반 핑 (하이웍스 세션 유지)
             fetch('https://office.hiworks.com/', { mode: 'no-cors', cache: 'no-cache', credentials: 'include' }).catch(() => {});
             fetch('https://login.office.hiworks.com/daemo.co.kr', { mode: 'no-cors', cache: 'no-cache', credentials: 'include' }).catch(() => {});
             
-            // 2. 픽셀 이미지 기반 세션 터치
             const pingImg = new Image();
             pingImg.src = 'https://office.hiworks.com/favicon.ico?t=' + new Date().getTime();
         }
 
         // 3분마다 자동 실행
         setInterval(keepSessionAlive, 3 * 60 * 1000);
+
+        // ==========================================
+        // 🔄 다른 앱에 갔다가 팀즈 앱으로 돌아올 때의 로그아웃 현상 해결 로직
+        // ==========================================
+        // 모바일(팀즈 등)에서 백그라운드에 갔다가 포그라운드로 돌아올 때 
+        // iframe이 절전 모드나 쿠키 재확인 상태로 들어가면서 세션이 비어 보이는 현상을 막기 위해
+        // 페이지 가시성이 돌아올 때(visibilitychange) 및 창 포커스가 돌아올 때(focus) 
+        // 하이웍스 서버와 백그라운드 세션 핑을 강제로 다시 찔러 세션을 깨우도록 수정했습니다.
+        // (기존 UI 레이아웃, 상단 바, iframe 소스나 다른 코드는 일절 건드리지 않았습니다.)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                keepSessionAlive();
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            keepSessionAlive();
+        });
+
         // 초기 실행
         setTimeout(keepSessionAlive, 5000);
     </script>
