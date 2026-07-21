@@ -9,6 +9,7 @@
             --brand-660c: #0067B1;
             --brand-646c: #3E72A2;
             --gold: #C5A059;
+            --sidebar-width: 280px; /* 요청하신 280px 설정 */
         }
 
         body { margin: 0; font-family: sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
@@ -68,6 +69,24 @@
         }
         .tab-item:hover { background: var(--brand-646c); }
 
+        /* 세션 배지 */
+        .session-badge {
+            display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.15);
+            color: #e0f2fe; padding: 4px 10px; border-radius: 12px; font-size: 11px; white-space: nowrap; margin-left: 5px;
+        }
+        .session-dot { width: 7px; height: 7px; background-color: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #10b981; }
+
+        /* 안드로이드 스타일 토글 스위치 */
+        .toggle-container {
+            display: flex; align-items: center; gap: 8px; margin: 0 10px; color: white; font-size: 13px; font-weight: bold;
+        }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--brand-646c); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
         .btn-external {
             background: var(--gold); color: white; padding: 0 10px; font-size: 12px;
             cursor: pointer; height: 28px; display: flex; align-items: center;
@@ -75,13 +94,12 @@
             flex-shrink: 0;
         }
 
-        /* iframe을 감싸는 컨테이너 추가 (터치 및 줌 허용) */
+        /* iframe 레이아웃 제어 */
         .frame-wrapper {
             width: 100%;
             flex-grow: 1;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-x pan-y;
+            overflow: hidden;
+            position: relative;
         }
 
         #content-frame { 
@@ -89,12 +107,34 @@
             height: 100%;
             border: none; 
             display: block;
+            transition: margin-left 0.3s ease, width 0.3s ease, transform 0.2s ease;
+            transform-origin: 0 0;
         }
+
+        /* 스위치 켜짐(사이드바 끔) 상태 */
+        .sidebar-hidden #content-frame {
+            margin-left: calc(-1 * var(--sidebar-width));
+            width: calc(100% + var(--sidebar-width));
+        }
+
+        /* 줌 컨트롤 버튼 (우하단) */
+        .zoom-controls { 
+            position: fixed; bottom: 20px; right: 20px; 
+            display: flex; gap: 10px; z-index: 2000; 
+        }
+        .zoom-controls button {
+            width: 45px; height: 45px; border-radius: 50%; border: none;
+            background: rgba(0, 0, 0, 0.4); color: white; font-size: 20px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px); transition: background 0.2s;
+        }
+        .zoom-controls button:active { background: rgba(0, 0, 0, 0.7); }
     </style>
 </head>
 <body>
     <div class="tab-container">
         <div class="tab-bar">
+            <!-- 기존 메뉴 구조 유지 -->
             <div class="dropdown"><div class="dropbtn">메일 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://mail.office.hiworks.com/daemo.co.kr/')">개인메일</div>
@@ -119,8 +159,8 @@
             <div class="dropdown"><div class="dropbtn">예약 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/841')">회의실</div>
-                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843')">차량</div>
                     <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/884')">노트북</div>
+                    <div onclick="loadPage('https://booking.office.hiworks.com/daemo.co.kr/booking/bookingResource/resourceList/843')">차량</div>
                 </div>
             </div>
             <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
@@ -130,18 +170,89 @@
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
                 </div>
             </div>
+            
+            <div class="session-badge" title="자동 세션 유지 핑(3분 주기) 동작 중">
+                <span class="session-dot"></span> 로그인 유지 중
+            </div>
         </div>
-        <div class="btn-external" onclick="openExternal()">외부 브라우저로 열기</div>
+
+        <!-- 안드로이드 스타일 토글 스위치 -->
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="sidebar-toggle" onchange="toggleSidebar(this.checked)">
+                <span class="slider"></span>
+            </label>
+            <span id="status-text">사이드바 켬</span>
+        </div>
+        
+        <div class="btn-external" onclick="openExternal()">외부에서 열기</div>
     </div>
     
-    <div class="frame-wrapper">
-        <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
+    <div id="frame-wrapper" class="frame-wrapper">
+        <iframe id="content-frame" src="https://login.office.hiworks.com/daemo.co.kr" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-storage-access-by-user-activation"></iframe>
+    </div>
+
+    <!-- 우하단 줌 컨트롤 -->
+    <div class="zoom-controls">
+        <button onclick="changeZoom(-0.1)">-</button>
+        <button onclick="changeZoom(0.1)">+</button>
     </div>
 
     <script>
         const iframe = document.getElementById('content-frame');
-        function loadPage(url) { iframe.src = url; }
-        function openExternal() { window.open(iframe.src, '_blank'); }
+        const frameWrapper = document.getElementById('frame-wrapper');
+        const statusText = document.getElementById('status-text');
+        let currentScale = 1.0;
+
+        // 저장된 마지막 URL 복원
+        const savedUrl = localStorage.getItem('hiworks_last_url');
+        if (savedUrl) {
+            iframe.src = savedUrl;
+        }
+        
+        function loadPage(url) { 
+            iframe.src = url; 
+            try {
+                localStorage.setItem('hiworks_last_url', url);
+            } catch(e) {}
+        }
+        
+        function openExternal() { 
+            window.open(iframe.src, '_blank'); 
+        }
+        
+        function toggleSidebar(isHidden) {
+            if (isHidden) {
+                frameWrapper.classList.add('sidebar-hidden');
+                statusText.innerText = '사이드바 끔';
+            } else {
+                frameWrapper.classList.remove('sidebar-hidden');
+                statusText.innerText = '사이드바 켬';
+            }
+        }
+
+        function changeZoom(delta) {
+            currentScale = Math.min(Math.max(0.5, currentScale + delta), 2.0);
+            iframe.style.transform = `scale(${currentScale})`;
+        }
+
+        // ==========================================
+        // 🔒 로그인 세션 자동 유지 (Keep-Alive Ping)
+        // ==========================================
+        function keepSessionAlive() {
+            // 1. fetch 기반 핑 (하이웍스 세션 유지)
+            fetch('https://office.hiworks.com/', { mode: 'no-cors', cache: 'no-cache', credentials: 'include' }).catch(() => {});
+            fetch('https://login.office.hiworks.com/daemo.co.kr', { mode: 'no-cors', cache: 'no-cache', credentials: 'include' }).catch(() => {});
+            
+            // 2. 픽셀 이미지 기반 세션 터치
+            const pingImg = new Image();
+            pingImg.src = 'https://office.hiworks.com/favicon.ico?t=' + new Date().getTime();
+        }
+
+        // 3분마다 자동 실행
+        setInterval(keepSessionAlive, 3 * 60 * 1000);
+        // 초기 실행
+        setTimeout(keepSessionAlive, 5000);
     </script>
 </body>
 </html>
