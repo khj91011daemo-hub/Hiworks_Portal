@@ -69,23 +69,6 @@
         }
         .tab-item:hover { background: var(--brand-646c); }
 
-        /* 세션 배지 */
-        .session-badge {
-            display: flex; align-items: center; gap: 6px; 
-            background: #10B981; color: #ffffff; 
-            padding: 4px 10px; border-radius: 14px; 
-            font-size: 12px; font-weight: bold; white-space: nowrap; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            margin: 0 5px;
-        }
-        .session-dot { width: 8px; height: 8px; background-color: #ffffff; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
-
-        @keyframes pulse {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
-        }
-
         /* 안드로이드 스타일 토글 스위치 */
         .toggle-container {
             display: flex; align-items: center; gap: 8px; margin: 0 10px; color: white; font-size: 13px; font-weight: bold;
@@ -139,59 +122,6 @@
             backdrop-filter: blur(4px); transition: background 0.2s;
         }
         .zoom-controls button:active { background: rgba(0, 0, 0, 0.7); }
-
-        /* 사전 로그인 안내 모달 */
-        .login-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .login-modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .login-modal-box {
-            background: #ffffff;
-            width: 420px;
-            padding: 28px;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
-        .login-modal-box h3 {
-            margin-top: 0;
-            color: #0067B1;
-            font-size: 20px;
-        }
-        .login-modal-box p {
-            color: #475569;
-            font-size: 14px;
-            line-height: 1.6;
-            margin: 15px 0 25px;
-        }
-        .btn-login-start {
-            background: #0067B1;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
-        }
-        .btn-login-start:hover {
-            background: #00528e;
-        }
     </style>
 </head>
 <body>
@@ -227,17 +157,12 @@
                 </div>
             </div>
             <div class="tab-item" onclick="loadPage('https://scheduler.office.hiworks.com/calendar')">일정</div>
-            <div class="dropdown"><div class="dropdown"><div class="dropbtn">게시판 ▾</div>
+            <div class="dropdown"><div class="dropbtn">게시판 ▾</div>
                 <div class="dropdown-content">
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2540?page=1')">공지사항</div>
                     <div onclick="loadPage('https://boards.office.hiworks.com/board/postlist/2750?page=1')">주간메뉴</div>
                 </div>
             </div>
-        </div>
-
-        <!-- 세션 자동 연장 가동 배지 -->
-        <div class="session-badge" title="로그인 후 세션이 끊기지 않도록 3분마다 백그라운드로 자동 연장합니다">
-            <span class="session-dot"></span> 세션 자동 연장
         </div>
 
         <!-- 안드로이드 스타일 토글 스위치 -->
@@ -249,7 +174,6 @@
             <span id="status-text">사이드바 켬</span>
         </div>
         
-        <div class="btn-external" style="background: #10B981;" onclick="goToLogin()" title="로그인 화면으로 이동합니다">🔑 로그인 화면</div>
         <div class="btn-external" onclick="openExternal()">외부에서 열기</div>
     </div>
     
@@ -263,20 +187,10 @@
         <button onclick="changeZoom(0.1)">+</button>
     </div>
 
-    <!-- 최초 사전 로그인 안내 대형 모달 -->
-    <div id="login-modal" class="login-modal-overlay">
-        <div class="login-modal-box">
-            <h3>🔑 하이웍스 로그인 안내</h3>
-            <p>팀즈 앱 내에서 바로 로그인을 진행해주세요.<br><br>아래 버튼을 누르면 로그인 화면으로 이동합니다.</p>
-            <button class="btn-login-start" onclick="closeLoginModal()">로그인 시작하기</button>
-        </div>
-    </div>
-
     <script>
         const iframe = document.getElementById('content-frame');
         const frameWrapper = document.getElementById('frame-wrapper');
         const statusText = document.getElementById('status-text');
-        const loginModal = document.getElementById('login-modal');
         let currentScale = 1.0;
 
         // 저장된 마지막 URL 복원
@@ -291,26 +205,6 @@
                 localStorage.setItem('hiworks_last_url', url);
             } catch(e) {}
         }
-
-        function goToLogin() {
-            loginModal.classList.remove('active');
-            loadPage('https://login.office.hiworks.com/daemo.co.kr');
-        }
-
-        function closeLoginModal() {
-            loginModal.classList.remove('active');
-            loadPage('https://login.office.hiworks.com/daemo.co.kr');
-        }
-
-        // 앱 처음 실행 시 로그인 모달 표시
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const isLogged = localStorage.getItem('hiworks_logged_in');
-                if (!isLogged) {
-                    loginModal.classList.clear('active'); // 안전 처리
-                }
-            }, 600);
-        });
         
         function openExternal() { 
             window.open(iframe.src, '_blank'); 
@@ -330,41 +224,6 @@
             currentScale = Math.min(Math.max(0.5, currentScale + delta), 2.0);
             iframe.style.transform = `scale(${currentScale})`;
         }
-
-        // ==========================================
-        // 🔒 로그인 세션 자동 유지 (Keep-Alive Ping)
-        // ==========================================
-        function keepSessionAlive() {
-            fetch('https://office.hiworks.com/', { mode: 'no-cors', cache: 'no-cache', credentials: 'include' }).catch(() => {});
-            fetch('https://login.office.hiworks.com/daemo.co.kr', { mode: 'no-cors', cache: 'no-cache', credentials: 'include' }).catch(() => {});
-            
-            const pingImg = new Image();
-            pingImg.src = 'https://office.hiworks.com/favicon.ico?t=' + new Date().getTime();
-        }
-
-        // 3분마다 자동 실행
-        setInterval(keepSessionAlive, 3 * 60 * 1000);
-
-        // ==========================================
-        // 🔄 다른 앱에 갔다가 팀즈 앱으로 돌아올 때의 로그아웃 현상 해결 로직
-        // ==========================================
-        // 모바일(팀즈 등)에서 백그라운드에 갔다가 포그라운드로 돌아올 때 
-        // iframe이 절전 모드나 쿠키 재확인 상태로 들어가면서 세션이 비어 보이는 현상을 막기 위해
-        // 페이지 가시성이 돌아올 때(visibilitychange) 및 창 포커스가 돌아올 때(focus) 
-        // 하이웍스 서버와 백그라운드 세션 핑을 강제로 다시 찔러 세션을 깨우도록 수정했습니다.
-        // (기존 UI 레이아웃, 상단 바, iframe 소스나 다른 코드는 일절 건드리지 않았습니다.)
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                keepSessionAlive();
-            }
-        });
-
-        window.addEventListener('focus', () => {
-            keepSessionAlive();
-        });
-
-        // 초기 실행
-        setTimeout(keepSessionAlive, 5000);
     </script>
 </body>
 </html>
